@@ -29,9 +29,19 @@ label {
   margin-bottom: 10px;
 }
 
-input[type=text] {
-  width: 95%;
+select {
+  width: 80px;
   padding: 12px;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+input[type=text] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  padding-right: 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -92,12 +102,12 @@ if (new URL(window.location.href).searchParams.get('mpID') === 'true'){
 </script>
 
 <form action="UserServlet" method="post">
-  <label for="action">Action:</label><br>
+  <label for="action">Action:</label>
   <select name="action" id="action">
   	<option value="add">Add</option>
   	<option value="remove">Remove</option>
   	<option value="search">Search</option>
-  </select><br><br>
+  </select><br><br><br>
   
   <label for="fname">First name:</label><br>
   <input type="text" id="fname" name="firstName"><br><br>
