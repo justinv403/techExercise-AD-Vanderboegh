@@ -21,7 +21,6 @@ public class UserServlet extends HttpServlet {
 	static String user = "justinv";
 	static String password = "!Msql403!";
 	private Connection conn = null;
-    private PreparedStatement stmt;
 
     public void init() throws ServletException {
     	try {
@@ -59,6 +58,8 @@ public class UserServlet extends HttpServlet {
         // continue getting info from HTML page
         String phoneNumber = request.getParameter("phoneNumber");
         String email = request.getParameter("email");
+        email = email.toLowerCase();
+        
         
         // get prepared statement and result set
         PreparedStatement stmt = null;
@@ -69,16 +70,23 @@ public class UserServlet extends HttpServlet {
         	
         	// tries to add a user
         	if ("add".equals(action)) {
-                stmt = conn.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
-                stmt.setInt(1, employeeID);
-                stmt.setString(2, firstName);
-                stmt.setString(3, lastName);
-                stmt.setString(4, phoneNumber);
-                stmt.setString(5, email);
-                stmt.executeUpdate();
+                if(firstName.length() > 0 && lastName.length() > 0 && phoneNumber.length() > 0 && email.length() > 0) {
+        		
+                	stmt = conn.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
+                	stmt.setInt(1, employeeID);
+                	stmt.setString(2, firstName);
+                	stmt.setString(3, lastName);
+                	stmt.setString(4, phoneNumber);
+                	stmt.setString(5, email);
+                	stmt.executeUpdate();
                 
-                // Redirect back to User.html with a success message
-                response.sendRedirect("User.html?success=true");
+                	// Redirect back to User.html with a success message
+                	response.sendRedirect("User.html?success=true");
+                } else {
+                	
+                	// Redirect back to User.html with a failure message
+                	response.sendRedirect("User.html?insufficientlen=true");
+                }
 
             
             // tries to remove a user
@@ -93,10 +101,14 @@ public class UserServlet extends HttpServlet {
             
             // tries to search the user database
         	} else if ("search".equals(action)) {
-                // preparation for table creation
-        		stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
-                stmt.setInt(1, employeeID);
-                rs = stmt.executeQuery();
+        		// preparation for table creation
+        		if(employeeIDStr.length() <= 0) {
+        			stmt = conn.prepareStatement("SELECT * FROM Users");
+        		} else {
+        			stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
+                    stmt.setInt(1, employeeID);
+        		}
+        		rs = stmt.executeQuery();
                 
                 // create table
                 PrintWriter out = response.getWriter();
