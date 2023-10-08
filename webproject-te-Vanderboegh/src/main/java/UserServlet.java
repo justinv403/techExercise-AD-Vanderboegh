@@ -60,7 +60,6 @@ public class UserServlet extends HttpServlet {
         String email = request.getParameter("email");
         email = email.toLowerCase();
         
-        
         // get prepared statement and result set
         PreparedStatement stmt = null;
         ResultSet rs = null;
