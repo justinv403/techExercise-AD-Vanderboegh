@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>New User Form</h2>
+
+<!-- Display success message if query parameter 'success' is 'true' -->
+<script>
+if (new URL(window.location.href).searchParams.get('success') === 'true') {
+  document.write('<p>User added successfully!</p>');
+}
+</script>
+
+<form action="UserServlet" method="post">
+  <label for="action">Action:</label><br>
+  <select name="action" id="action">
+  	<option value="add">Add</option>
+  	<option value="remove">Remove</option>
+  	<option value="search">Search</option>
+  </select><br>
+  
+  <label for="fname">First name:</label><br>
+  <input type="text" id="fname" name="firstName"><br>
+  
+  <label for="lname">Last name:</label><br>
+  <input type="text" id="lname" name="lastName"><br>
+  
+  <label for="eid">Employee ID:</label><br>
+  <input type="text" id="eid" name="employeeID"><br>
+  
+  <label for="pnum">Phone Number:</label><br>
+  <input type="text" id="pnum" name="phoneNumber"><br>
+  
+  <label for="email">Email:</label><br>
+  <input type="text" id="email" name="email"><br><br>
+  
+  <input type="submit" value="Submit">
+</form> 
+
+</body>
+</html>
