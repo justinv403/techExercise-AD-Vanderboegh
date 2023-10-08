@@ -1,16 +1,93 @@
 <!DOCTYPE html>
 <html>
+<head>
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  background: -webkit-linear-gradient(45deg, #f3ec78, #af4261);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  color: black;
+  text-align: center;
+  font-size: 2em;
+}
+
+form {
+  width: 50%;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+input[type=text] {
+  width: 95%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.message {
+    color: white;
+    padding: 10px; 
+    margin-bottom:15px; 
+}
+
+.success {
+    background-color:#4CAF50; 
+}
+
+.error {
+    background-color:#f44336; 
+}
+</style>
+</head>
 <body>
 
-<h2>New User Form</h2>
+<h2>User Form</h2>
 
 <!-- Display success message if query parameter 'success' is 'true' -->
 <script>
 if (new URL(window.location.href).searchParams.get('success') === 'true') {
-  document.write('<p>User modified successfully!</p>');
+	var successDiv = document.createElement('div');
+	successDiv.className = 'message success';
+	successDiv.textContent = 'User modified successfully!';
+	document.body.insertBefore(successDiv, document.body.firstChild);
 }
 if (new URL(window.location.href).searchParams.get('insufficientlen') === 'true') {
-  document.write('<p>One or more fields is missing!</p>')
+	var errorDiv = document.createElement('div');
+	errorDiv.className = 'message error';
+	errorDiv.textContent = 'One or more fields is missing!';
+	document.body.insertBefore(errorDiv, document.body.firstChild);
+}
+if (new URL(window.location.href).searchParams.get('mpID') === 'true'){
+	var errorDiv = document.createElement('div');
+	errorDiv.className = 'message error';
+	errorDiv.textContent = 'Must provide Employee ID!';
+	document.body.insertBefore(errorDiv, document.body.firstChild);
 }
 </script>
 

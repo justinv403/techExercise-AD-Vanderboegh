@@ -90,12 +90,20 @@ public class UserServlet extends HttpServlet {
             
             // tries to remove a user
         	} else if ("remove".equals(action)) {
-                stmt = conn.prepareStatement("DELETE FROM Users WHERE EmployeeID = ?");
-                stmt.setInt(1, employeeID);
-                stmt.executeUpdate();
+                // only remove user if ID provided
+        		if(employeeIDStr.length() <= 0) {
+                	// return to page with error message passed as a parameter
+        			response.sendRedirect("User.html?mpID=true");
+                } else {
+                	// delete user from ID
+                	stmt = conn.prepareStatement("DELETE FROM Users WHERE EmployeeID = ?");
+                	stmt.setInt(1, employeeID);
+                	stmt.executeUpdate();
                 
-                // Redirect back to User.html with a success message
-                response.sendRedirect("User.html?success=true");
+                	// Redirect back to User.html with a success message
+                	response.sendRedirect("User.html?success=true");
+                
+                }
 
             
             // tries to search the user database
