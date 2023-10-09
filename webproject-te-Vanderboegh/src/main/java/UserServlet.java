@@ -109,12 +109,7 @@ public class UserServlet extends HttpServlet {
             // tries to search the user database
         	} else if ("search".equals(action)) {
         		// preparation for table creation
-        		/*if(employeeIDStr.length() <= 0) {
-        			stmt = conn.prepareStatement("SELECT * FROM Users");
-        		} else {
-        			stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
-                    stmt.setInt(1, employeeID);
-        		}*/
+        		boolean searchSuccess = false;
         		
         		
         		// search database
@@ -122,67 +117,76 @@ public class UserServlet extends HttpServlet {
         		if(employeeIDStr.length() <= 0 && firstName.length() <= 0 && lastName.length() <= 0
         				&& phoneNumber.length() <= 0 && email.length() <= 0) {
         			stmt = conn.prepareStatement("SELECT * FROM Users");
+        			rs = stmt.executeQuery();
+        			searchSuccess = true;
         		
         		// search by ID
         		} else if( employeeIDStr.length() > 0 && firstName.length() <= 0 && lastName.length() <= 0
         				&& phoneNumber.length() <= 0 && email.length() <= 0) {
         			stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
                     stmt.setInt(1, employeeID);
+                    rs = stmt.executeQuery();
+                    searchSuccess = true;
         		
         		// search by first name
         		} else if (firstName.length() > 0 && employeeIDStr.length() <= 0 && lastName.length() <= 0
         				&& phoneNumber.length() <= 0 && email.length() <= 0) {
         			stmt = conn.prepareStatement("SELECT * FROM Users WHERE LOWER(FirstName) LIKE ?");
                     stmt.setString(1, "%" + firstName + "%");
+                    rs = stmt.executeQuery();
+                    searchSuccess = true;
         		
         		// search by last name
         		} else if (lastName.length() > 0 && employeeIDStr.length() <= 0 && firstName.length() <= 0 
         				&& phoneNumber.length() <= 0 && email.length() <= 0) {
         			stmt = conn.prepareStatement("SELECT * FROM Users WHERE LOWER(LastName) LIKE ?");
                     stmt.setString(1, "%" + lastName + "%");
+                    rs = stmt.executeQuery();
+                    searchSuccess = true;
         		
         		// search by phone number
     			} else if (phoneNumber.length() > 0 && employeeIDStr.length() <= 0 && firstName.length() <= 0 && lastName.length() <= 0
         				&& email.length() <= 0) {
     				stmt = conn.prepareStatement("SELECT * FROM Users WHERE PhoneNumber LIKE ?");
                     stmt.setString(1, "%" + phoneNumber + "%");
+                    rs = stmt.executeQuery();
+                    searchSuccess = true;
         	
         		// search by email
 				} else if (email.length() > 0 && employeeIDStr.length() <= 0 && firstName.length() <= 0 && lastName.length() <= 0
         				&& phoneNumber.length() <= 0) {
 					stmt = conn.prepareStatement("SELECT * FROM Users WHERE LOWER(Email) LIKE ?");
                     stmt.setString(1, "%" + email + "%");
-				} else {
-					// Redirect back to User.html with an error message
-                	response.sendRedirect("User.html?success=false");
+                    rs = stmt.executeQuery();
+                    searchSuccess = true;
 				}
         		
-        		
-        		
-        		
-        		
-        		rs = stmt.executeQuery();
                 
-                // create table
-                PrintWriter out = response.getWriter();
-                out.println("<html><head><style>"
-                        + "table {width: 100%;border-collapse: collapse;margin: 15px 0;}"
-                        + "th, td {border: 1px solid #999;padding: 0.5rem;text-align: left;}"
-                        + "th {background-color: #f3f3f3;}"
-                        + "</style></head><body><table>");
-                out.println("<tr><th>Employee ID</th><th>First Name</th><th>LastName</th><th>Phone Number</th><th>Email</th></tr>");
-                while (rs.next()) {
-                    int empId = rs.getInt(1);
-                    String fName = rs.getString(2);
-                    String lName = rs.getString(3);
-                    String phoneNum = rs.getString(4);
-                    String eMail = rs.getString(5);
-                    
-                    out.println("<tr><td>" + empId + "</td><td>" + fName + "</td><td>" + lName + "</td><td>" + phoneNum + "</td><td>" + eMail + "</td></tr>");
-                }
-                out.println("</table><br>");
-                out.println("<button style=\"font-size:1em;padding:10px;background-color:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;\" onclick=\"location.href='User.html'\">Menu</button>");
-                out.println("</body></html>");
+                // create table if search conditions met
+        		if(searchSuccess) {
+        			PrintWriter out = response.getWriter();
+                    out.println("<html><head><style>"
+                            + "table {width: 100%;border-collapse: collapse;margin: 15px 0;}"
+                            + "th, td {border: 1px solid #999;padding: 0.5rem;text-align: left;}"
+                            + "th {background-color: #f3f3f3;}"
+                            + "</style></head><body><table>");
+                    out.println("<tr><th>Employee ID</th><th>First Name</th><th>LastName</th><th>Phone Number</th><th>Email</th></tr>");
+                    while (rs.next()) {
+                        int empId = rs.getInt(1);
+                        String fName = rs.getString(2);
+                        String lName = rs.getString(3);
+                        String phoneNum = rs.getString(4);
+                        String eMail = rs.getString(5);
+                        
+                        out.println("<tr><td>" + empId + "</td><td>" + fName + "</td><td>" + lName + "</td><td>" + phoneNum + "</td><td>" + eMail + "</td></tr>");
+                    }
+                    out.println("</table><br>");
+                    out.println("<button style=\"font-size:1em;padding:10px;background-color:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;\" onclick=\"location.href='User.html'\">Menu</button>");
+                    out.println("</body></html>");
+        		} else {
+        			response.sendRedirect("User.html?success=false");
+        		}
+                
             }
 
         // catch any errors
@@ -212,5 +216,9 @@ public class UserServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void printSQLTable(ResultSet rs) {
+    	
     }
 }

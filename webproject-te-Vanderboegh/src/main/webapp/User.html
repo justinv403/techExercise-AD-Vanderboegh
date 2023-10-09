@@ -87,6 +87,12 @@ if (new URL(window.location.href).searchParams.get('success') === 'true') {
 	successDiv.textContent = 'User modified successfully!';
 	document.body.insertBefore(successDiv, document.body.firstChild);
 }
+if (new URL(window.location.href).searchParams.get('success') === 'false') {
+	var errorDiv = document.createElement('div');
+	errorDiv.className = 'message error';
+	errorDiv.textContent = 'Too many arguments!';
+	document.body.insertBefore(errorDiv, document.body.firstChild);
+}
 if (new URL(window.location.href).searchParams.get('insufficientlen') === 'true') {
 	var errorDiv = document.createElement('div');
 	errorDiv.className = 'message error';
