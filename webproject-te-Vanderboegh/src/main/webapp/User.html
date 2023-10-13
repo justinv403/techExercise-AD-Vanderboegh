@@ -87,7 +87,7 @@ if (new URL(window.location.href).searchParams.get('success') === 'true') {
 	successDiv.textContent = 'User modified successfully!';
 	document.body.insertBefore(successDiv, document.body.firstChild);
 }
-if (new URL(window.location.href).searchParams.get('success') === 'false') {
+if (new URL(window.location.href).searchParams.get('tmArgs') === 'true') {
 	var errorDiv = document.createElement('div');
 	errorDiv.className = 'message error';
 	errorDiv.textContent = 'Too many arguments!';
@@ -103,6 +103,18 @@ if (new URL(window.location.href).searchParams.get('mpID') === 'true'){
 	var errorDiv = document.createElement('div');
 	errorDiv.className = 'message error';
 	errorDiv.textContent = 'Must provide Employee ID!';
+	document.body.insertBefore(errorDiv, document.body.firstChild);
+}
+if (new URL(window.location.href).searchParams.get('success') === 'false'){
+	var errorDiv = document.createElement('div');
+	errorDiv.className = 'message error';
+	errorDiv.textContent = 'Unexpected Error!';
+	document.body.insertBefore(errorDiv, document.body.firstChild);
+}
+if (new URL(window.location.href).searchParams.get('typeFailure') === 'true'){
+	var errorDiv = document.createElement('div');
+	errorDiv.className = 'message error';
+	errorDiv.textContent = 'User ID must be an Integer!';
 	document.body.insertBefore(errorDiv, document.body.firstChild);
 }
 </script>

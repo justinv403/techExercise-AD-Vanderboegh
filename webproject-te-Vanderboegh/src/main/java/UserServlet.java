@@ -51,9 +51,15 @@ public class UserServlet extends HttpServlet {
         // this prevents null errors
         String employeeIDStr = request.getParameter("employeeID");
         int employeeID = 0;
-        if(employeeIDStr != null && !employeeIDStr.isEmpty()) {
-        	employeeID = Integer.parseInt(request.getParameter("employeeID"));
+        // try to convert to int
+        try {
+        	if(employeeIDStr != null && !employeeIDStr.isEmpty()) {
+            	employeeID = Integer.parseInt(request.getParameter("employeeID"));
+            }
+        } catch(NumberFormatException e) {
+        	// it will be ignored for now - catch later
         }
+        
         
         // continue getting info from HTML page
         String phoneNumber = request.getParameter("phoneNumber");
@@ -69,24 +75,27 @@ public class UserServlet extends HttpServlet {
         	
         	// tries to add a user
         	if ("add".equals(action)) {
-                if(firstName.length() > 0 && lastName.length() > 0 && phoneNumber.length() > 0 && email.length() > 0) {
+                try {
+                	if(firstName.length() > 0 && lastName.length() > 0 && phoneNumber.length() > 0 && email.length() > 0) {
         		
-                	stmt = conn.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
-                	stmt.setInt(1, employeeID);
-                	stmt.setString(2, firstName);
-                	stmt.setString(3, lastName);
-                	stmt.setString(4, phoneNumber);
-                	stmt.setString(5, email);
-                	stmt.executeUpdate();
+                		stmt = conn.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?)");
+                		stmt.setInt(1, employeeID);
+                		stmt.setString(2, firstName);
+                		stmt.setString(3, lastName);
+                		stmt.setString(4, phoneNumber);
+                		stmt.setString(5, email);
+                		stmt.executeUpdate();
                 
-                	// Redirect back to User.html with a success message
-                	response.sendRedirect("User.html?success=true");
-                } else {
+                		// Redirect back to User.html with a success message
+                		response.sendRedirect("User.html?success=true");
+                	} else {
                 	
-                	// Redirect back to User.html with a failure message
-                	response.sendRedirect("User.html?insufficientlen=true");
+                		// Redirect back to User.html with a failure message
+                		response.sendRedirect("User.html?insufficientlen=true");
+                	}
+                } catch(NumberFormatException e) {
+                	response.sendRedirect("User.html?typeFailure=true");
                 }
-
             
             // tries to remove a user
         	} else if ("remove".equals(action)) {
@@ -95,13 +104,22 @@ public class UserServlet extends HttpServlet {
                 	// return to page with error message passed as a parameter
         			response.sendRedirect("User.html?mpID=true");
                 } else {
-                	// delete user from ID
-                	stmt = conn.prepareStatement("DELETE FROM Users WHERE EmployeeID = ?");
-                	stmt.setInt(1, employeeID);
-                	stmt.executeUpdate();
-                
-                	// Redirect back to User.html with a success message
-                	response.sendRedirect("User.html?success=true");
+                	// catch integer error for user id
+                	try {
+                		// parse the integer -- again
+                		employeeID = Integer.parseInt(employeeIDStr);
+                		
+                		// delete user from ID
+                    	stmt = conn.prepareStatement("DELETE FROM Users WHERE EmployeeID = ?");
+                    	stmt.setInt(1, employeeID);
+                    	stmt.executeUpdate();
+                    
+                    	// Redirect back to User.html with a success message
+                    	response.sendRedirect("User.html?success=true");
+                	} catch(NumberFormatException e) {
+                		response.sendRedirect("User.html?typeFailure=true");
+                	}
+                	
                 
                 }
 
@@ -110,6 +128,7 @@ public class UserServlet extends HttpServlet {
         	} else if ("search".equals(action)) {
         		// preparation for table creation
         		boolean searchSuccess = false;
+        		boolean typeFailure = false;
         		
         		
         		// search database
@@ -122,12 +141,18 @@ public class UserServlet extends HttpServlet {
         		
         		// search by ID
         		} else if( employeeIDStr.length() > 0 && firstName.length() <= 0 && lastName.length() <= 0
-        				&& phoneNumber.length() <= 0 && email.length() <= 0) {
-        			stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
-                    stmt.setInt(1, employeeID);
-                    rs = stmt.executeQuery();
-                    searchSuccess = true;
-        		
+        		        && phoneNumber.length() <= 0 && email.length() <= 0) {
+        		    // catch error if user inputs string instead of integer
+        			try {
+        		        employeeID = Integer.parseInt(employeeIDStr);
+        		        stmt = conn.prepareStatement("SELECT * FROM Users WHERE EmployeeID = ?");
+        		        stmt.setInt(1, employeeID);
+        		        rs = stmt.executeQuery();
+        		        searchSuccess = true;
+        		    } catch (NumberFormatException e) {
+        		        searchSuccess = false;
+        		        typeFailure = true;
+        		    }
         		// search by first name
         		} else if (firstName.length() > 0 && employeeIDStr.length() <= 0 && lastName.length() <= 0
         				&& phoneNumber.length() <= 0 && email.length() <= 0) {
@@ -184,7 +209,11 @@ public class UserServlet extends HttpServlet {
                     out.println("<button style=\"font-size:1em;padding:10px;background-color:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;\" onclick=\"location.href='User.html'\">Menu</button>");
                     out.println("</body></html>");
         		} else {
-        			response.sendRedirect("User.html?success=false");
+        			if(!typeFailure) {
+        				response.sendRedirect("User.html?tmArgs=true");
+        			} else {
+        				response.sendRedirect("User.html?typeFailure=true");
+        			}
         		}
                 
             }
@@ -216,9 +245,5 @@ public class UserServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    private void printSQLTable(ResultSet rs) {
-    	
     }
 }
